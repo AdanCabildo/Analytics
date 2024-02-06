@@ -1,0 +1,188 @@
+---
+title: R Homework 2
+author: Adan L. Cabildo BSCS-SS212
+output: html_document
+---
+# **Introduction**
+In this project, we will dive deep into the movies dataset using R programming. The movies dataset will contain 25 variables: Title, Year,	Length,	Budget,	Rating,	Votes,	r1-r10,	MPAA,	The genres: Action,	Animation,	Comedy,	Drama,	Documentary,	Romance, and	Short that accepts binary (1s and 0s) and 58788 rows or movies. 
+
+We will analyze trends, create visualizations, and utilize different graphs for better representation of data.
+
+# **Libraries**
+Here are the libraries we're going to use for this project:
+```{r}
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(reshape2)
+library(Hmisc)
+library(tidyr)
+```
+***
+# **Import Dataset**
+Let's import the Movies dataset that we need for this project using the code below:
+```{r}
+movies <- read.table(file='moviesA.csv', header = TRUE, sep = ",")
+head(movies)
+```
+***
+# **Problem 1**
+Look at the `moviesA.csv` dataset which is given to you together with this RMD file. Make a bar chart that shows how many movies per year are in the data set, for the years 1900-1920.
+
+**Solution**: 
+Let's create a dataset for the Movies within 1900 - 1920:
+```{r}
+movies0020 <- movies %>% filter(year >= 1900 & year <= 1920)
+```
+Let's create the bar graph to display the count of movies within 1900 to 1920:
+```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
+ggplot(data = movies0020, aes(x = as.factor(year))) + 
+    geom_bar(width = 0.5,
+             fill = "lightgreen",
+             color = "black",
+             alpha = 0.8,
+             position = "dodge") + 
+    labs(title = "Table 1: Movies from 1900 to 1920", x = "Year", y = "Count of Movies")  
+```
+**Findings**: In table 1, we can see that movies within 1900 to 1920; years 1914 and 1915 produced the highest count of movies. On the other hand, year 1902 consists the lowest number of movies. 
+
+***
+# **Problem 2**
+Create a dot chart that shows how many movies per year are in the data set, for all years. Use `stat_summary` with `fun.y=length` to do this. 
+
+**Question**: Compare the difference when the `year` variable is treated as a factor or as a number. Which do you think makes the better plot?
+
+**Solution**: First, let's create the dot chart using the Year **as factor**:
+```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
+ggplot(movies, aes(x = as.factor(year))) + 
+  stat_summary(fun = "length", geom = "point", aes(y = year)) + 
+  labs(title = "Table 2: Count of Movies per Year as factor", x = "Year", y = "Count of Movies")
+```
+In **table 2**, we used the Year as factor resulting for the ggplot to read the year as a factor, where each variable becomes a factor for the plot making the x axis to be cramped and harder to read.
+
+Next, let's now create the dot chart using the Year **as numeric**:
+```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
+ggplot(movies, aes(x = as.numeric(year))) + 
+  stat_summary(fun = "length", geom = "point", aes(y = year)) + 
+  labs(title = "Table 3: Count of Movies per Year as numeric", x = "Year", y = "Count of Movies")
+```
+In table 3, we used the Year as numeric resulting for the ggplot to read the years as numeric. Automatically formatting the years to display with gaps of 30 years making it much easier to read.
+
+**Answer**: When we present graphs, we present our findings; which means clean graph represents clean findings. As we can see in the tables above, it is obvious that using the Year **as numeric** displays a much cleaner x axis. Clean X axis means clean visualization. Clean visualization means happy client.
+
+**Findings**: We can say that the production of movies increased significantly after entering the 21st century.
+
+***
+# **Problem 3**
+Use the commands `stat_summary` and `geom_pointrange` to show the average ratings per year, +/- 95% confidence intervals, for all years. You can use the command `mean_cl_boot()` to compute the mean and CI's automatically.
+
+**Solution**: Let's create a dot chart using *stat_summary* and *geom_pointrange*. To compute for the mean and confidence intervals, we will be using *mean_cl_boot*.
+```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
+ggplot(na.omit(movies), aes(x = year, y = rating)) + 
+  geom_pointrange(stat = "summary", fun.data = mean_cl_boot) + 
+  labs(title = "Table 4: Average Ratings per Year", 
+       x = "Year", 
+       y = "Rating") 
+```
+**Findings**: In **table 4**, we can see that the average rating of the movies produced in the 21st century is growing upwards. 
+
+We can make hypothesis to this such as:
+
+1. New technologies in the Movie industry is significant in creating higher rating movies.
+2. The use of social media in 21st century can boost marketing for audience impact resulting in higher rating for movies.
+
+***
+# **Problem 4**
+**Problem 4a**: Create a line chart that shows the number of movies per year and per genre (Action, Animation, Comedy, Drama, Documentary, Romance, and Short). If a movie has multiple genres, then it should be counted in each one.
+
+Hint: You can use the `melt()` command and then do a `subset()` to get the data into the form that you need.
+
+**Solution**: First, let's create a subset for our genres:
+```{r}
+genres_subset <- movies[, c("year", "Action", "Animation", "Comedy", "Drama", "Documentary", "Romance", "Short")]
+```
+Then, let's melt together the genres with variables year, genre, and count:
+```{r}
+genres_melt <- melt(genres_subset, id.vars = "year", variable.name = "genre", value.name = "count")
+```
+Let's convert it into a subset that will contain only the rows where count is 1:
+```{r}
+genres_melt <- subset(genres_melt, count == 1)
+```
+Finally, create the line graph that will present the number of genres of movies per year:
+```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
+ggplot(genres_melt , aes(x = year, group = genre, color = genre)) +
+  stat_summary(geom = "line", position = "stack", fun = "length", aes(y = count)) +
+  labs(title = "Table 5: Number of Movies per Year and Genre",
+       x = "Year",
+       y = "Number of Movies") +
+  theme_minimal()
+```
+**Problem 4b**: Remake the same plot, but as a stacked area chart. This is done by using `geom='area'`, and then `position='stack'`, inside the call to stat_summary. (you'll also want to use `fill` instead of `color` most likely)
+
+**Solution**: To recreate the same plot but as stacked area chart, we will use *fill* inside the ggplot instead of *color*, finally the labs for the labels of our plot.
+```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
+ggplot(genres_melt, aes(x = year, fill = genre)) +
+  stat_summary(geom = "area", position = "stack", fun = "length", aes(y = count)) +
+  labs(title = "Table 6: Number of Movies per Year and Genre",
+       x = "Year",
+       y = "Number of Movies") +
+  theme_minimal()
+```
+**Findings**: In tables 5 and 6, we saw the growth of produced movies in the Action genre. Additionally, looking at the big picture, it is obvious that the number of movies dramatically increased in the 21st century.
+
+***
+# **Problem 5**
+Choose the 5 most common genres in the data set, and make a line chart showing the average ratings per year and genre. 
+
+**Solution**: First, let's use the melt function to convert the necessary columns from wide format to long format:
+```{r}
+genres_melt = melt(movies, id.vars=c("year"), measure.vars=c("Action", "Animation", "Comedy", "Drama", "Documentary", "Romance", "Short"))
+```
+Get the rows with existing values only:
+```{r}
+genres_subset = subset(genres_melt, value == 1)
+```
+Next, let's create a data frame that will aggregate the count of each genre per year:
+```{r}
+genre = aggregate(value ~ year + variable, data = genres_subset, FUN = length)
+colnames(genre) = c("year", "genre", "count")
+```
+Let's get the sum of all the genres necessary then gather the columns to convert it from wide to long format that will convert the genres into 2 columns: Genre (contains the genres) and Count (count of movies per genre):
+```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
+top_genres = movies %>%
+  select(Action, Animation, Comedy, Drama, Documentary, Romance, Short) %>%
+  summarise_all(list(~sum(. > 0))) %>%
+  gather(key = "genre", value = "count") %>%
+  arrange(desc(count)) %>%
+  head(5) %>%
+  pull(genre)
+```
+Let's apply the same concept of the above to ratings to find the ratings for each genre per year:
+```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
+ratings = movies %>%
+  select(year, rating, all_of(top_genres)) %>%
+  gather(key = "genre", value = "has_genre", -year, -rating) %>%
+  filter(has_genre > 0) %>%
+  group_by(year, genre) %>%
+  summarise(avg_rating = mean(rating, na.rm = TRUE))
+```
+Finally, create the line chart to display the top genres with the ratings per year:
+```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
+ggplot(ratings, aes(x = year, y = avg_rating, color = genre, group = genre)) +
+  geom_line() +
+  labs(title = "Table 7: Average Ratings per Genre per Year",
+       x = "Year",
+       y = "Average Rating",
+       color = "Genre") +
+  theme_minimal()
+```
+**Findings**: In table 7, during 1920s to 1925s we saw a peak of movies with high ratings in the Action genre. Then, from 1950s forward we can see the separation of the genres up to the 21st century. Lastly, the latest top rating movie genre falls to the Short genres.
+
+***
+# **Reflection**
+Doing this activity made me realize that it's more flexible to analyze data using R. You have more control over the data. It's like knitting - where each column represents the threads and you, the  analyst, make clothes out of the threads where R is your needle to control each thread. Additionally, researching is unavoidable - every step I take and every breath I make I research through the internet. I can only imagine myself in the future using R and still learning new techniques. I would love to master this language and handle data like a pro.
+
+***
+**Created by:*** Adan L. Cabildo | BSCS-SS212 APC 2024
+

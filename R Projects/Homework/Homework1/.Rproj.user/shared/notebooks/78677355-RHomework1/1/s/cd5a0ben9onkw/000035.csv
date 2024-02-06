@@ -1,0 +1,4 @@
+"0",""
+"0","# Let's also create a bar graph for better visualization."
+"0","text(x = barplot(race_table, main = """", xlab = """", ylab = """", col = rainbow(length(race_table))),"
+"0","     y = race_table + 1, labels = race_table, pos = 1)"

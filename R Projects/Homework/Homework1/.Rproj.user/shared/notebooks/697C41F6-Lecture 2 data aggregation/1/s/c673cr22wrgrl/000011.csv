@@ -1,0 +1,3 @@
+"0","ddply(dataset_hw1, ""race.ref.person"", mutate, percent = n.races / sum(n.races))"
+"2","Error: object 'dataset_hw1' not found
+"

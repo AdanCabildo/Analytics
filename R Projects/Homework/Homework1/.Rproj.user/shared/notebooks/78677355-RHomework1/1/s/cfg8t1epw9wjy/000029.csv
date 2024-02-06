@@ -1,0 +1,7 @@
+"0","library(plyr)"
+"0","library(knitr) # for the kable() function, which prints data frames as tables:"
+"0",""
+"0","# group the chickens by diet and take average weight"
+"0","avg.weights = ddply(ChickWeight, ""Diet"", summarize, avg.weight = mean(weight))"
+"0","# display the data frame as an easy-to-read table, with 3 significant digits"
+"0","kable(avg.weights, digits = 3, col.names = c('Diet', 'Average Weight'))"

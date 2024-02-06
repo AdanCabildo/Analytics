@@ -1,0 +1,8 @@
+"0","# First, let's get the total number per race."
+"0","number_per_race <- table(expenditures$race.ref.person)"
+"0",""
+"0","# Let us now get the fraction of the total number per race and multiply it by 100 for percentage."
+"0","fraction_tpr <- prop.table(number_per_race) * 100"
+"0",""
+"0","# Finally, using kable, let's display the percentage per race."
+"0","kable(fraction_tpr, digits = 3, col.names = c(""Race"", ""Total Percentage""))"

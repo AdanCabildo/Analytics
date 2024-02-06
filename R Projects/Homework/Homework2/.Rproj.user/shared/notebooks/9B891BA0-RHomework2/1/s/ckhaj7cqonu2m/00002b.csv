@@ -1,0 +1,3 @@
+"0","ggplot(movies, aes(x = as.numeric(year))) + "
+"0","  stat_summary(fun = ""length"", geom = ""point"", aes(y = year)) + "
+"0","  labs(title = ""Table 3: Count of Movies per Year as numeric"", x = ""Year"", y = ""Count of Movies"")"

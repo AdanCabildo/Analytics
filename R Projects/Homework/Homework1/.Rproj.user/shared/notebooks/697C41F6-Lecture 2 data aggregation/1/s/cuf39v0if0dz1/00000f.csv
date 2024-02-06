@@ -1,0 +1,3 @@
+"0","# Load the file and save it as a data frame called expenditures."
+"0","# Don't forget to change the working directory if necessary!"
+"0","expenditures = read.table(file='expenditures_lec2.csv', header=T, sep=',')"

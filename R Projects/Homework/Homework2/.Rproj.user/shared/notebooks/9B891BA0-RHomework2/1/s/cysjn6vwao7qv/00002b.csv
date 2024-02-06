@@ -1,0 +1,7 @@
+"0","ggplot(data = movies0020, aes(x = as.factor(year))) + "
+"0","    geom_bar(width = 0.5,"
+"0","             fill = ""lightgreen"","
+"0","             color = ""black"","
+"0","             alpha = 0.8,"
+"0","             position = ""dodge"") + "
+"0","    labs(title = ""Table 1: Movies from 1900 to 1920"", x = ""Year"", y = ""Count of Movies"")  "

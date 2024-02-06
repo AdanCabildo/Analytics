@@ -1,0 +1,6 @@
+"0","ggplot(genres_melt , aes(x = year, group = genre, color = genre)) +"
+"0","  stat_summary(geom = ""line"", position = ""stack"", fun = ""length"", aes(y = count)) +"
+"0","  labs(title = ""Table 5: Number of Movies per Year and Genre"","
+"0","       x = ""Year"","
+"0","       y = ""Number of Movies"") +"
+"0","  theme_minimal()"

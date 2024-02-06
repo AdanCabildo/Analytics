@@ -1,0 +1,2 @@
+"0","movies <- read.table(file='moviesA.csv', header = TRUE, sep = "","")"
+"0","head(movies)"

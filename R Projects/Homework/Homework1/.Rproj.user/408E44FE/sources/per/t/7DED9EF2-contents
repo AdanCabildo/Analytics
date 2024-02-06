@@ -1,0 +1,166 @@
+<style>
+ td {
+  width: 150px;
+}
+</style>
+---
+title: "ANLYTC3 R Homework 1"
+author: "Adan Cabildo"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+#### Instructions 
+
+The due date is 0730AM 31 Jan 2024. Submit BOTH the Knit HTML file and the Rmd file. DO NOT FORGET TO TURN IN these files in the MS TEAMS ASSIGNMENT TAB.
+
+Fill in the missing code chunks to answer the following questions. You should use a reasonable coding style and comment your code so that it is clear what you are doing. As a rough rule of thumb, expect to add at least one comment to each missing code chunk.
+
+If the question asks for a numerical answer, such as "what fraction of households in the data set satisfy condition X," do not hard code the value from the computation. If the data set changes, your answer should  update automatically. 
+
+Here are two recommended ways that you can report your answer:
+
+**Example Question 1:** In the `cars` data set, what is the average value of the `speed` column?
+
+```{r}
+# take average of mpg$speed, save as variable
+avg.speed = mean(cars$speed)
+avg.speed
+```
+
+**Answer:** The average value was `r avg.speed`
+
+**Example Question 1:** In the `ChickWeight` data set, what was the average weight of the chickens grouped by each diet type?
+
+```{r}
+library(plyr)
+library(knitr) # for the kable() function, which prints data frames as tables:
+
+# group the chickens by diet and take average weight
+avg.weights = ddply(ChickWeight, "Diet", summarize, avg.weight = mean(weight))
+# display the data frame as an easy-to-read table, with 3 significant digits
+kable(avg.weights, digits = 3, col.names = c('Diet', 'Average Weight'))
+
+```
+
+
+#### Questions 
+
+**Note:** We will assume that the data file `dataset_hw1.csv` is in your working directory.
+
+**Problem 1:** 
+
+Load the CSV file `dataset_hw1.csv` into memory, using the command `read.file()` or `read.csv()` as described in lecture. Save the result as a variable called `expenditures`. 
+
+Hint: You may want to look at the CSV file using another program such as excel to see if the first row is a header. 
+
+```{r}
+# Let's import the dataset_hw1 that we need and name it expenditures.
+expenditures = read.csv(file='dataset_hw1.csv', header=TRUE, sep=',')
+```
+
+**Problem 2:**
+
+a) How many variables are in the data set? 
+
+b) The column `race.ref.person` describes the race of each respondent. What are the different levels that this column is allowed to take?
+
+**ANSWER:** 
+
+a) There are `r ncol(expenditures)` variables in the data set.
+
+b) The allowable races are: `r unique(expenditures$race.ref.person)`
+
+**Problem 3:**
+
+What fraction of records in the data set belong to each `race.ref.person`?
+
+```{r}
+# First, let's get the total number per race.
+number_per_race <- table(expenditures$race.ref.person)
+
+# Let us now get the fraction of the total number per race and multiply it by 100 for percentage.
+fraction_tpr <- prop.table(number_per_race) * 100
+
+# Finally, using kable, let's display the percentage per race.
+kable(fraction_tpr, digits = 3, col.names = c("Race", "Total Percentage"))
+
+# Let's create a bar graph for better visualization.
+text(x = barplot(fraction_tpr, main = "Percentage per Race", 
+    xlab = "Race", ylab = "Total Percentage", col = "skyblue"),
+    y = fraction_tpr + 1, labels = sprintf("%.2f%%", fraction_tpr), pos = 1)
+
+```
+
+**Problem 4:**
+
+Change the `expenditures` data frame so that `race.ref.person` column has only 3 coded types: 
+
+1. black
+2. white
+3. others (all else)
+
+Print the number of records in each `race.ref.person` as a table.
+
+```{r}
+# Let's create an if-else condition to identify rows that is not black or white in column race.ref.person then change them to "others".
+expenditures$race.ref.person = factor(ifelse(expenditures$race.ref.person %in% c("black", "white"), expenditures$race.ref.person, "others"), label = c("black", "white", "others"))
+
+# Let's create a table consisting of race available in our data set.
+race_table <- table(expenditures$race.ref.person)
+# Next, let's display the table using kable:
+kable(race_table, col.names = c("Race", "Total"))
+
+# Let's also create a bar graph for better visualization.
+text(x = barplot(race_table, main = "", xlab = "", ylab = "", col = rainbow(length(race_table))),
+     y = race_table + 1, labels = race_table, pos = 1)
+
+# Legends
+legend("topright", legend = levels(expenditures$race.ref.person), fill = rainbow(length(race_table)), cex = 0.8)
+```
+
+**Problem 5:**
+
+
+What fraction of the general population live in the Midwest, Northeast, South, and West regions of the US? What fraction of those in the 96% income percentile (i.e., the "96%") live in these regions? Do the percentages differ for the general population and the "96%"?
+
+Create a data frame with the following columns:
+
+1. `region`: Midwest, Northeast, South, West, and NA (not everyone reports their region!)
+2. `general.pop`: the percentage of households in `expenditures` in each region
+3. `rich.pop`: the percentage of households whose `income.rank` is greater than 0.96 in each region
+
+(as a sanity check, both the `general.pop` and `rich.pop` columns should sum to 1)
+
+Print this data frame as a table. Hint: you may want to use the function `merge()` to combine two data frames. (see the self-study material for lecture 2)
+
+What are the main differences in the percentages for the general and rich population?
+
+
+
+```{r}
+# First, let's use the if-else condition to find NA values within the region in expenditures dataset, then change each to a workable NA as character.
+expenditures$region <- ifelse(is.na(expenditures$region), "NA", as.character(expenditures$region))
+
+# general.pop: Let's create the data frame for our general population for each region.
+general.pop <- as.data.frame(prop.table(table(expenditures$region)) * 100) # Note that I multiplied the result by 100 to present it as percentage.
+# Let's name the columns Region and general.pop.
+names(general.pop) <- c("Region", "general.pop")
+
+#rich.pop: Next, Let's create the data frame for our rich population for each region.
+rich.pop <- as.data.frame(prop.table(table(expenditures$region[expenditures$income.rank > 0.96])) * 100)# Note that I multiplied the result by 100 to present it as percentage.
+
+# Let's also name the columns Region and rich.pop.
+names(rich.pop) <- c("Region", "rich.pop")
+
+# Finally, let us merge the 2 data frames we created. And we're going to call it df_region.data. 
+df_region.data <- merge(general.pop, rich.pop, by = "Region", all = TRUE)
+
+# We can now display the data frame using kable function. We're going to name the 3 columngs Region, General Population, and Rich Population for easy readability.
+kable(df_region.data, digits = 3, col.names = c("Region", "General Population", "Rich Population"))
+
+
+```
+

@@ -1,0 +1,7 @@
+"0","# Let's create an if-else condition to identify rows that is not black or white in column race.ref.person then change them to ""others""."
+"0","expenditures$race.ref.person = factor(ifelse(expenditures$race.ref.person %in% c(""black"", ""white""), expenditures$race.ref.person, ""others""), label = c(""black"", ""white"", ""others""))"
+"0",""
+"0","# Let's create a table consisting of race available in our data set."
+"0","race_table <- table(expenditures$race.ref.person)"
+"0","# Next, let's display the table using kable:"
+"0","kable(race_table, col.names = c(""Race"", ""Total""))"

@@ -1,0 +1,1 @@
+"0","summarize(expenditures, avg.food = mean(food), avg.housing = mean(housing), n.households = length(housing))"

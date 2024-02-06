@@ -1,0 +1,3 @@
+"0",""
+"0","# Legends"
+"0","legend(""topright"", legend = levels(expenditures$race.ref.person), fill = rainbow(length(race_table)), cex = 0.8)"

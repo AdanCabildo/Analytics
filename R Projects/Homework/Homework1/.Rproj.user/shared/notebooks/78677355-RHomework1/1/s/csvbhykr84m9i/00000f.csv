@@ -1,0 +1,7 @@
+"0","# take average of mpg$speed, save as variable"
+"0","avg.speed = mean(cars$speed)"
+"0","avg.speed"
+"1","[1]"
+"1"," 15.4"
+"1","
+"

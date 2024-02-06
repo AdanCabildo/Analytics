@@ -1,0 +1,3 @@
+"0","# What is the total spent by each household?"
+"0","expenditures = mutate(expenditures, total = food + housing + healthcare + transportation)"
+"0","head(expenditures)"

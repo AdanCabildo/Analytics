@@ -1,0 +1,6 @@
+"0",""
+"0","# Let's create a bar graph for better visualization."
+"0","text(x = barplot(fraction_tpr, main = ""Percentage per Race"", "
+"0","    xlab = ""Race"", ylab = ""Total Percentage"", col = ""skyblue""),"
+"0","    y = fraction_tpr + 1, labels = sprintf(""%.2f%%"", fraction_tpr), pos = 1)"
+"0",""

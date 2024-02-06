@@ -1,0 +1,3 @@
+"0","# group by region and income class"
+"0","counts = ddply(expenditures, c(""region"", ""income.class""), summarize, n.households = length(housing))"
+"0","counts "

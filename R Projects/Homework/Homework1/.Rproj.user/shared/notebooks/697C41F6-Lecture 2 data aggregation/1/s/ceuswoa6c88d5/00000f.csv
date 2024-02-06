@@ -1,0 +1,2 @@
+"0","# make a plot"
+"0","with(expenditures, plot(x=food[ region == ""South"" ], y=housing[ region == ""South""])) # easier to read!"

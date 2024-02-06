@@ -1,0 +1,1 @@
+{"frames":[{"func":"ddply(dataset_hw1, \"race.ref.person\", mutate, percent = n.races/sum(n.races))","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0},{"func":"empty(.data)","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0}],"message":"Error: object 'dataset_hw1' not found\n"}

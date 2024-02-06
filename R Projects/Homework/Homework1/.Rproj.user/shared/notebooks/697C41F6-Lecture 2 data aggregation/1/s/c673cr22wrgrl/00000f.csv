@@ -1,0 +1,2 @@
+"0","# What fraction of households in each region are in each income class?"
+"0","ddply(counts, ""region"", mutate, percent = n.households / sum(n.households))"

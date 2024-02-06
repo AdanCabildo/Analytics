@@ -1,0 +1,4 @@
+"0","# keep all rows where income.class is not NA:"
+"0","expenditures = subset(expenditures, subset = !is.na(population.size))"
+"0","# Q: how about"
+"0","# expenditures = subset(expenditures, subset = complete.cases(expenditures)) ?"

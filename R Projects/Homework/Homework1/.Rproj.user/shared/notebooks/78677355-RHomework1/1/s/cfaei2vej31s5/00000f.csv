@@ -1,0 +1,2 @@
+"0","# Let's import the dataset_hw1 that we need and name it expenditures."
+"0","expenditures = read.csv(file='dataset_hw1.csv', header=TRUE, sep=',')"

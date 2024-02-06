@@ -1,0 +1,2 @@
+"0","# group by region and then take summary"
+"0","ddply(expenditures, ""region"", summarize, avg.food = mean(food), avg.housing = mean(housing), n.households = length(housing))"

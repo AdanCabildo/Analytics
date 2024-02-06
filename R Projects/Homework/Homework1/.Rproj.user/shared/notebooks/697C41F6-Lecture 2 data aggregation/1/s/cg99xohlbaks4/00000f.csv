@@ -1,0 +1,6 @@
+"0","# what does this do?"
+"0","expenditures$income.class = mapvalues(expenditures$income.class,"
+"0","                          from = c(""$5K-$9,999"", ""$10K-$14,999"", ""$15K-$19,999"","
+"0","                            ""$20K-$29,999"", ""$30K-$39,999"", ""$40K-$49,999"","
+"0","                            ""$50K-$69,999"", ""$70K+""),"
+"0","                          to = c(""low"", ""low"", ""low"", ""medium"", ""medium"", ""medium"", ""high"", ""high"") )"
