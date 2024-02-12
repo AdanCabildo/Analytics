@@ -136,18 +136,7 @@ ggplot(genres_melt, aes(x = year, fill = genre)) +
 Choose the 5 most common genres in the data set, and make a line chart showing the average ratings per year and genre. 
 
 **Solution**: First, let's use the melt function to convert the necessary columns from wide format to long format:
-```{r}
-genres_melt = melt(movies, id.vars=c("year"), measure.vars=c("Action", "Animation", "Comedy", "Drama", "Documentary", "Romance", "Short"))
-```
-Get the rows with existing values only:
-```{r}
-genres_subset = subset(genres_melt, value == 1)
-```
-Next, let's create a data frame that will aggregate the count of each genre per year:
-```{r}
-genre = aggregate(value ~ year + variable, data = genres_subset, FUN = length)
-colnames(genre) = c("year", "genre", "count")
-```
+
 Let's get the sum of all the genres necessary then gather the columns to convert it from wide to long format that will convert the genres into 2 columns: Genre (contains the genres) and Count (count of movies per genre):
 ```{r fig.width=10, fig.height=3, dpi=100, fig.align='center'}
 top_genres = movies %>%

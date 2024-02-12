@@ -1,0 +1,154 @@
+<style>
+ td {
+  width: 150px;
+}
+</style>
+---
+title: R Homework 3
+author: Adan L. Cabildo | BSCS-SS212
+output: html_document
+---
+# **Introduction**
+In this project we will explore the Consumer Expenditure Survey. We will create graphs and plots to represent data trends and findings.
+
+This dataset consists of:
+
+* Expenditures (with keys)
+* Household (with keys)
+* Income (with keys)
+* Items (with keys)
+
+# **Libraries**
+Here are the libraries we’re going to use for this project:
+```{r}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(tidyverse)
+```
+
+# **Preliminaries**
+We'll use the data file `hw2data.rda`, which should be in the same directory as this markdown file:
+```{r}
+load('hw2data.rda')
+```
+
+# **The Dataset**
+Unlike a CSV file, which only contains one data frame, an `.rda` file contains multiple R variables, and can only be opened by R. You should have the following data frames, all taken from the Consumer Expenditure Survey:
+
+1. `expenditure`: A data frame of expenditure amounts by category for 4000 households
+2. `household`: A data frame of household and demographic information (for the same 4000 households).
+3. `income`: A data frame of income and job information (for the same 4000 households)
+
+The column names for `expenditure`, `household`, and `income` are hard to decipher. So there are 3 more data frames, with explanations for the column names.
+
+4. `expenditure.key`: Description of each column in `expenditure`
+5. `household.key`: Description of each column in `household`
+6. `income.key`: Description of each column in `income`
+
+Finally, there are two more data frames:
+
+7. `item.purchases`: Each row corresponds to a specific itemized purchase made by the households. The household ID, the cost, and a `ucc` code giving a description of the purchase is included.
+8. `item.key`: Descriptions of the different `ucc` codes
+
+Note that in `expenditure.key`, several of the expenditure categories have numbers, giving the "level" of the category. For example `food (1)` can be divided into `food at home (2)` and `food away from home (2)`. The latter subcategory can be further divided into `food excluding meals as pay (3)` and `meals as pay (3)`.
+
+**Written by**: *Rhea-Luz Valbuena*
+
+***
+# **Problem 1** 
+Make a dot chart showing the 25 most common itemized purchases, and how often they were reported in the data frame `item.purchases`. You should use the actual category descriptions in your chart, not the UCC codes.
+
+**Solution**: Let's create a new data frame consists of item.purchases and item.key where the ucc is the common variable of the two:
+```{r}
+merged_item <- merge(item.purchases, item.key, by = "ucc", all.x = TRUE)
+```
+Let's create a table of the items to know the frequency of each:
+```{r}
+category_freq <- table(merged_item$descr)
+```
+Now, let's sort the table into an ascending order and pull the top 25 then insert it into a new object:
+```{r}
+top_categories <- names(tail(sort(category_freq, decreasing = FALSE), 25))
+```
+Finally, let's create the dot chart to display the top 25 most common purchases among the households:
+```{r fig.width=10, fig.height=10, dpi=100, fig.align='center'}
+suppressWarnings(
+dotchart(category_freq[top_categories], main = "Figure 1: Top 25 Most Common Purchases", xlab = "Frequency", ylab = "Category Description")
+)
+```
+**Question**: Were there any categories that you expected to see, but didn't?
+
+**Answer**: Yes, the **Medicare Payments** since medical insurances in the US is super costly - I thought that it will be included in the top purchases of these households. But, after analyzing the data frame, Medicare Payments is just below the Cash contributions to Churches and Organizations. I was surprised that most of these households spend more to contribution to the churches and organizations than medical insurances.
+
+**Findings**: In figure 1, it is obvious that the most purchased items are the average food and non-alcoholic beverages because it is one of the basic necessities of a human. Looking at the chart as a whole, it is worth noting that people prioritizes what they need and less on what they want: the basic human necessities such as food and water, comfortable shelter, and medicine. 
+
+It is also noticeable in this survey that house-cost and maintenance is really really expensive - proves the existence of Housing Crisis in the US.
+
+***
+**Problem 2:**
+
+Make the same dot chart as before, but group the data into 10 equally sized groups according to the age of the reference person. For each age group, show the same 25 categories as you did in problem 1. 
+
+Use `facet_wrap()` or `facet_grid()` to show your results in 10 charts, one per age group. 
+
+To make comparisons easier, in each of your plots add a reference line showing the number of purchases for each category, averaged over all age groups. 
+
+(Hint: You can do this by adding a `geom_line()` which has its own data frame and mapping. If this data frame doesn't include the faceting variable, the line is plotted in all facets.)
+
+**Solution**: Let's create a dataframe for the merged item and household necessary variables:
+```{r}
+merged_item_household = merge(select(merged_item, newid, descr, ucc), select(household, newid, age_ref), by = "newid") %>%
+  arrange(age_ref)
+```
+Let's break the merged dataframe earlier into 10:
+```{r}
+merged_item_household = merged_item_household %>% mutate(age_group = cut(age_ref, breaks = 10, labels = FALSE))
+```
+Now, let's get the frequency of the occurrence of the item descriptions for each group:
+```{r}
+frequency_counts = merged_item_household %>%
+  group_by(age_group, descr) %>%
+  dplyr::summarize(freq = n(), .groups = "drop") %>%
+  arrange(age_group, desc(freq))
+```
+Next, let's get the most common 25 occurrences of item description:
+```{r}
+top_descr = merged_item_household %>%
+  group_by(age_group, descr) %>%
+  dplyr::summarise(freq = n(), .groups = "drop") %>%
+  arrange(age_group, desc(freq)) %>%
+  group_by(age_group) %>%
+  top_n(25, freq)
+```
+Then, get the average frequency of each top 25 common items:
+```{r}
+average = top_descr %>%
+  group_by(descr) %>%
+  dplyr::summarise(average = mean(freq, na.rm = TRUE))
+```
+Finally, let's create the dot plot:
+```{r fig.width=20, fig.height=12, dpi=100, fig.align='center'}
+#plot the charts
+plot = ggplot(top_descr, aes(x =descr, y = freq)) +
+  geom_point() +
+  geom_line(data = average, aes(x = descr, y = average, group = 1), color = "red", inherit.aes = FALSE) +
+  labs(title= "Figure 2: Top 25 Items per Age Group", x = "Frequency", y ="Category Description") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  facet_wrap(~age_group, ncol = 2)
+
+print(plot)
+```
+
+**Question**: For the youngest age group, which item categories are purchased with above average frequency? For the oldest age group, which item categories are purchased with above average frequency?
+
+**Answer**: In figure 2, for the youngest age group, we can see that there no purchases above the average frequency, but we can see that they are the only group with purchases of Check Accounts, Cigarettes, and Coin Operated Laundries. Now for the oldest age group, we can see that they have above average of purchases in Medicare Payments. Additionally, they are the only age group that contributes to churches and organizations, and engages in Gardening/Lawn services.
+
+**Findings**: We can say that using this plot, we can create market target strategies solely by utilizing the age group profiles and their purchase frequency.
+
+***
+# **Reflection**
+I had fun working with this project. It made me realize that R really deserves the spot to be no.1 in data analytics. With R, we can really handle the individual variables and manipulate it to create plots for making findings. Additionally, working with R projects itches the crooks and crannies of my brain-folds. This kind of project make me crave for professional analytics. Lastly, more studying and researching on R is recommended.
+
+***
+**Created by**: *Adan L. Cabildo | BSCS-SS212 APC 2024*
